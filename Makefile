@@ -81,5 +81,4 @@ define Package/netclient/postinst
 exit 0
 endef
 
-$(eval $(call GoBinPackage,netclient)) \
-$(eval $(call BuildPackage,netclient)) \
+$(eval $(call BuildPackage,netclient))
