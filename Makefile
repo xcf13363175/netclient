@@ -74,7 +74,7 @@ define Package/netclient/postinst
 #!/bin/sh
 	#chmod +x ./etc/init.d/netclient
 	#chmod +x ./etc/netclient
-	chmod +x /etc/hotplug.d/iface/*
+	chmod +x ./etc/hotplug.d/iface/99-netclient
 endef
 
 $(eval $(call GoBinPackage,netclient))
