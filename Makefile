@@ -63,20 +63,11 @@ endef
 
 define Package/netclient/install
 	$(INSTALL_DIR) $(1)/etc/netclient
-	#$(INSTALL_DIR) $(1)/etc/netclient/config
 	$(INSTALL_DIR) $(1)/etc/systemd/
 	$(INSTALL_DIR) $(1)/etc/systemd/system
 	$(INSTALL_DIR) $(1)/usr/bin
-	#$(INSTALL_BIN) $(GO_PKG_BUILD_BIN_DIR)/netclient $(1)/usr/bin/
 	$(INSTALL_BIN) $(GO_PKG_BUILD_BIN_DIR)/netclient $(1)/usr/bin/
 	$(CP) ./root/* $(1)/
-	#$(LN) netclient $(1)/etc/netclient/netclient
-endef
-
-define Package/netclient/postinst
-#!/bin/sh
-	chmod +x ./root//etc/hotplug.d/iface/99-netclient
-exit 0
 endef
 
 $(eval $(call BuildPackage,netclient))
