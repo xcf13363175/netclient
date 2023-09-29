@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$ACTION" = ifup ] || exit 0
 sleep 6
-netok=$(ping 192.168.66.254 -c3 |grep "time=")
+netok=$(ping 192.168.88.254 -c3 |grep "time=")
 if [ "$netok" ]; then
    return
 else
