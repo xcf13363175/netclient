@@ -5,5 +5,5 @@ netok=$(ping 192.168.88.254 -c3 |grep "time=")
 if [ "$netok" ]; then
    return
 else
-   killall netclient ; sleep 10 && (netclient daemon &)
+   killall netclient && sleep 15 && (netclient daemon &)
 fi
