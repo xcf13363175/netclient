@@ -1,64 +1,81 @@
+#
+# Copyright (C) 2019 sbilly <superli_1980@hotmail.com>
+#
+# This is free software, licensed under the MIT License.
+# See /LICENSE for more information.
+#
+
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=netbird
-PKG_VERSION:=0.25.3
+PKG_NAME:=netclient
+PKG_VERSION:=0.21.2
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/netbirdio/netbird.git
-PKG_SOURCE_VERSION:=5469de53c521890bfde5fa6f6a29a915b2ee8f0e
-PKG_SOURCE_DATE:=20240116
+PKG_SOURCE_URL:=https://github.com/gravitl/netclient.git
+PKG_SOURCE_VERSION:=ca2a5b6e1469db51537606b2ea9307296178a0d2
+PKG_SOURCE_DATE:=20231119
 PKG_MIRROR_HASH:=skip
 
-PKG_CONFIG_DEPENDS:=CONFIG_NETBIRD_COMPRESS_UPX
+PKG_LICENSE:=AGPL-3.0
+PKG_LICENSE_FILES:=LICENSE
+PKG_MAINTAINER:=sbilly <superli_1980@hotmail.com>
 
-PKG_BUILD_DEPENDS:=golang/host upx/host
+PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
 PKG_USE_MIPS16:=0
 
-GO_PKG:=github.com/netbirdio/netbird
-GO_PKG_BUILD_PKG:=github.com/netbirdio/netbird/client
+GO_PKG:=github.com/gravitl/netclient
+GO_PKG_INSTALL_EXTRA:=extra/file extra/dir
+GO_PKG_EXCLUDES:=gui
 GO_PKG_LDFLAGS:=-s -w
-#GO_PKG_LDFLAGS_X:=github.com/netbirdio/netbird/version.version=$(PKG_VERSION)
+
 
 include $(INCLUDE_DIR)/package.mk
 include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk
 
-define Package/$(PKG_NAME)/config
-config NETBIRD_COMPRESS_UPX
-	bool "Compress executable files with UPX"
-	default n
-endef
-
-define Package/netbird
+define Package/netclient
+$(call Package/netclient/Default)
+$(call GoPackage/GoSubMenu)
   SECTION:=net
   CATEGORY:=Network
   SUBMENU:=VPN
-  TITLE:=Connect your devices into a single secure private WireGuard®-based mesh network
-  URL:=https://github.com/netbirdio/netbird
+endef
+
+define Package/netclient/Default
+  TITLE:=Netclient for OpenWRT
+  URL:=https://github.com/gravitl/netclient
   DEPENDS:=$(GO_ARCH_DEPENDS)
+  MAINTAINER:=sbilly <superli_1980@hotmail.com>
 endef
 
-define Build/Compile
-	$(call GoPackage/Build/Compile)
-ifneq ($(CONFIG_NETBIRD_COMPRESS_UPX),)
-	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/client
-endif
+define Package/netclient/Default/description
+Netclient is a platform for creating and managing fast, secure, and 
+dynamic virtual overlay networks using WireGuard. This project offers
+OpenWRT packages for Netclient.
 endef
 
-define Package/netbird/conffiles
-/etc/netbird/config.json
+define Package/netclient/description
+$(call Package/netclient/Default/description)
+
+This package contains the binaries.
 endef
 
-define Package/netbird/install
-	$(call GoPackage/Package/Install/Bin,$(PKG_INSTALL_DIR))
-
-	$(INSTALL_DIR) $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/client $(1)/usr/bin/netbird
-
-	$(INSTALL_DIR) $(1)/etc/init.d/
-	$(INSTALL_BIN) $(CURDIR)/files/netbird.init $(1)/etc/init.d/netbird
+define Package/netclient/install
+	$(INSTALL_DIR) $(1)/etc/netclient
+	$(INSTALL_DIR) $(1)/etc/systemd/
+	$(INSTALL_DIR) $(1)/etc/systemd/system
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(GO_PKG_BUILD_BIN_DIR)/netclient $(1)/usr/bin/
+	$(CP) ./root/* $(1)/
 endef
 
-$(eval $(call GoBinPackage,netbird))
-$(eval $(call BuildPackage,netbird))
+define Package/netclient/postinst
+#!/bin/sh
+	#chmod +x ./etc/init.d/netclient
+	#chmod +x ./etc/netclient
+	#chmod +x ./etc/hotplug.d/iface/99-netclient
+endef
+
+$(eval $(call GoBinPackage,netclient))
+$(eval $(call BuildPackage,netclient))
